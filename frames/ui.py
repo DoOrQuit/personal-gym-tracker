@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 
-class AppInterface:
+class MainInterface:
     def __init__(self):
         # -------- Window arrangement ---------- #
         self.root = Tk()
@@ -14,9 +14,7 @@ class AppInterface:
         self.image = PhotoImage(file="images/main_img_original.png")
         side_banner = self.canvas.create_image(150, 350, image=self.image)
         self.canvas.config(highlightthickness=0)
-        self.canvas.grid(column=0, row=0, rowspan=30)
-
-        self.login()
+        self.canvas.grid(column=0, row=0, rowspan=3)
 
         self.root.mainloop()
 
@@ -37,32 +35,6 @@ class AppInterface:
         self.label2 = Label(self.tab2, text="I'm number 2")
         self.label2.grid(row=0, column=0)
 
-    def login(self):
-        # --------- Login labels ---------- #
-        user_label = Label(text="User: ", padx=20)
-        user_label.grid(column=1, row=14)
-        password_label = Label(text="Password: ", padx=20)
-        password_label.grid(column=1, row=15)
-        # --------- Login Buttons ---------- #
-        users_list_button = Button(text="All Users >", padx=10, command=self.users_list)
-        users_list_button.grid(column=3, row=14)
-        login_button = Button(text="Login", width=17, command=self.security_check)
-        login_button.grid(column=2, row=16)
-        # --------- Login Entries ---------- #
-        user_entry = Entry()
-        user_entry.config()
-        user_entry.grid(column=2, row=14)
-        password_entry = Entry()
-        password_entry.grid(column=2, row=15)
 
-
-    def logout(self):
-        pass
-
-    def security_check(self) -> bool:
-        pass
-
-    def users_list(self):
-        pass
 
 
