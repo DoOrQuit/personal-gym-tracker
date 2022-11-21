@@ -1,10 +1,6 @@
-from ui import AppInterface
-import pandas
+from frames.security import Security
 
-app = AppInterface()
-
-
-
+app = Security()
 
 
 
