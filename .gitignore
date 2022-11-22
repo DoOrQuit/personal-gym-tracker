@@ -1,5 +1,6 @@
 # Personal files to be ignored
 EXAMPLE.py
+.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
