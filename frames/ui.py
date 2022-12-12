@@ -47,7 +47,6 @@ class MainInterface:
 
         self.root.mainloop()
 
-
     def settings(self):
         # ----------------------- Window Parameters ------------------ #
         settings_window = Tk()

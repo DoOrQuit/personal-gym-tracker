@@ -6,15 +6,14 @@ import os
 
 class Security:
     def __init__(self):
-        # -------- Window arrangement ---------- #
+        # -------- Window arrangement ------------------- #
         self.root = Tk()
         self.root.title("Gym Activity Tracker")
-        # self.root.config(pady=5, padx=5)
         self.root.minsize(600, 300)
         # -------- IMG/(Banner) placing ----------------- #
         self.canvas = Canvas(width=600, height=156)
         self.image = PhotoImage(file="images/divide.png")
-        side_banner = self.canvas.create_image(300, 78, image=self.image)
+        self.canvas.create_image(300, 78, image=self.image)
         self.canvas.config(highlightthickness=0)
         self.canvas.grid(column=0, row=0, columnspan=4)
         self.login()
@@ -32,12 +31,12 @@ class Security:
         # --------- Login Buttons ---------- #
         add_user = Button(text="➕ Add User", command=self.add_user)
         add_user.grid(column=2, row=1, pady=(20, 0))
-        login_button = Button(text="Login", width=17, command=self.security_check)
-        login_button.grid(column=0, row=3)
+        login_button = Button(text="Login", width=25, command=self.security_check)
+        login_button.grid(column=1, row=3)
         # --------- Login Entries ---------- #
         user_name = StringVar(self.root)
-        user_name.set("antony")
-        user_drop_list = OptionMenu(self.root, user_name, f"antony")
+        user_name.set("Choose an User")
+        user_drop_list = OptionMenu(self.root, user_name, "TEST")
         user_drop_list.config(width=24)
         user_drop_list.grid(column=1, row=1, pady=(20, 5))
         password_entry = Entry(width=30)
@@ -45,7 +44,7 @@ class Security:
 
     @staticmethod
     def add_user():
-        """Function creates a new profile and saves it in settings for further initializing of a user"""
+        """Function creates a new profile and saves it in settings for further initialization"""
         new_user_window = Toplevel()
         new_user_window.focus()
         new_user_window.title("New User")
@@ -67,25 +66,28 @@ class Security:
         new_pass_entry.grid(column=1, row=1, pady=(5, 5))
         confirm_pass_entry = Entry(new_user_window)
         confirm_pass_entry.grid(column=1, row=2)
-        # ----------------- Buttons -------------------- #
 
+        # ----------------- Buttons -------------------- #
         def save_user():
             """Fetches and saves a data taken from widgets to save to a local settings file"""
             name = new_name_entry.get()
             password = new_pass_entry.get()
             confirm_password = confirm_pass_entry.get()
-            # Creating a DICT from TK Entries as data set to use with a pandas lib
-            new_user = {"name": f"{name}", "password": f"{password}"}
-            data = pd.DataFrame(new_user, index=[0])
+
+            new_user_data = {"name": [f"{name}"], "password": [f"{password}"]}
 
             if password == confirm_password and name != "":
 
                 # Checking if setting file exists. In this case data will be appended to existing file
-                if os.path.isfile(f"settings/users_list.csv"):
+                if os.path.isfile("settings/users_list.csv"):
+                    existed_data = pd.read_csv("settings/users_list.csv")
+                    new_id = int(len(existed_data.id))
+                    data = pd.DataFrame(new_user_data, index=[new_id])
                     data.to_csv("settings/users_list.csv", mode="a", header=False)
                     new_user_window.destroy()
                 else:
-                    data.to_csv("settings/users_list.csv", mode="w", index_label="id")
+                    data = pd.DataFrame(new_user_data)
+                    data.to_csv("settings/users_list.csv", mode="w", index_label="id", index=True)
                     new_user_window.destroy()
             else:
                 if password != confirm_password:
@@ -96,8 +98,28 @@ class Security:
         new_user_button = Button(new_user_window, text="✔ Save", width=10, command=save_user)
         new_user_button.grid(column=1, row=3, pady=(20, 20))
 
+
     def security_check(self) -> bool:
-        pass
+        """Method validates the user's name and password(if applied) entered
+        and returns True if security check has been passed"""
+        security_condition = False
+        user_data_exist = True
+        try:
+            if os.path.isfile(f"settings/users_list.csv"):
+                user_data_exist = True
+            else:
+                user_data_exist = False
+
+        except FileNotFoundError:
+            showerror(
+                title="User identification error",
+                message="User doesn't exist. Please, check the spelling or create a new user."
+            )
+
+
+
+
+
 
     def users_list(self):
         pass
