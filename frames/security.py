@@ -1,46 +1,53 @@
+import tkinter.messagebox
 from tkinter import *
 from tkinter.messagebox import showerror
 import pandas as pd
 import os
 
+# Fetching the users list for displaying in OptionMenu
+users_df = pd.read_csv("settings/users_list.csv")
+USERS_LIST = [user for user in users_df.name]
+
 
 class Security:
     def __init__(self):
         # -------- Window arrangement ------------------- #
-        self.root = Tk()
-        self.root.title("Gym Activity Tracker")
-        self.root.minsize(600, 300)
+        self.master = Tk()
+        self.master.title("Gym Activity Tracker")
+        self.master.geometry("600x300")
+        self.security_passed = False
+        self.user_name = StringVar(self.master, "User Name")
+        self.user_pass = StringVar(self.master)
         # -------- IMG/(Banner) placing ----------------- #
-        self.canvas = Canvas(width=600, height=156)
-        self.image = PhotoImage(file="images/divide.png")
+        self.canvas = Canvas(self.master, width=600, height=156)
+        self.image = PhotoImage(master=self.master, file="images/divide.png")
         self.canvas.create_image(300, 78, image=self.image)
         self.canvas.config(highlightthickness=0)
         self.canvas.grid(column=0, row=0, columnspan=4)
-        self.login()
+        # --------- Login labels ------------------------ #
+        self.user_label = Label(self.master, text="User: ")
+        self.user_label.grid(column=0, row=1, pady=(20, 5))
+        self.password_label = Label(self.master, text="Password: ", padx=50)
+        self.password_label.grid(column=0, row=2, pady=(0, 10))
+        self.info_label = Label(self.master, text="(Optional)", anchor="e")
+        self.info_label.grid(column=2, row=2, pady=(0, 10))
+        # --------- Login Buttons ----------------------- #
+        self.add_user = Button(self.master, text="➕ Add User", command=self.add_user)
+        self.add_user.grid(column=2, row=1, pady=(20, 5))
+        self.login_button = Button(self.master, text="Login", width=25, command=self.security_check)
+        self.login_button.grid(column=1, row=3)
+        # --------- Login Entries ----------------------- #
+        self.user_drop_list = OptionMenu(self.master, self.user_name, *USERS_LIST)
+        self.user_drop_list.config(width=24)
+        self.user_drop_list.grid(column=1, row=1, pady=(20, 5))
+        self.password_entry = Entry(self.master, width=30, textvariable=self.user_pass)
+        self.password_entry.grid(column=1, row=2, pady=(0, 10))
 
-        self.root.mainloop()
 
-    def login(self):
-        # --------- Login labels ---------- #
-        user_label = Label(text="User: ")
-        user_label.grid(column=0, row=1, pady=(20, 5))
-        password_label = Label(text="Password: ", padx=50)
-        password_label.grid(column=0, row=2, pady=(0, 10))
-        info_label = Label(text="(Optional)", anchor="e")
-        info_label.grid(column=2, row=2)
-        # --------- Login Buttons ---------- #
-        add_user = Button(text="➕ Add User", command=self.add_user)
-        add_user.grid(column=2, row=1, pady=(20, 0))
-        login_button = Button(text="Login", width=25, command=self.security_check)
-        login_button.grid(column=1, row=3)
-        # --------- Login Entries ---------- #
-        user_name = StringVar(self.root)
-        user_name.set("Choose an User")
-        user_drop_list = OptionMenu(self.root, user_name, "TEST")
-        user_drop_list.config(width=24)
-        user_drop_list.grid(column=1, row=1, pady=(20, 5))
-        password_entry = Entry(width=30)
-        password_entry.grid(column=1, row=2)
+    def run(self):
+        self.master.mainloop()
+        return self.security_passed
+
 
     @staticmethod
     def add_user():
@@ -50,7 +57,6 @@ class Security:
         new_user_window.title("New User")
         new_user_window.minsize(300, 150)
         new_user_window.attributes("-topmost", True)
-
         # ----------------- Labels -------------------- #
         new_user_name = Label(new_user_window, text="User Name:")
         new_user_name.grid(column=0, row=0, pady=(20, 5), padx=30)
@@ -99,27 +105,28 @@ class Security:
         new_user_button.grid(column=1, row=3, pady=(20, 20))
 
 
-    def security_check(self) -> bool:
-        """Method validates the user's name and password(if applied) entered
+    def security_check(self):
+        """Method validates the user's name and password (if applied) entered
         and returns True if security check has been passed"""
-        security_condition = False
-        user_data_exist = True
-        try:
-            if os.path.isfile(f"settings/users_list.csv"):
-                user_data_exist = True
-            else:
-                user_data_exist = False
 
-        except FileNotFoundError:
-            showerror(
-                title="User identification error",
-                message="User doesn't exist. Please, check the spelling or create a new user."
+        user_name_entered = self.user_name.get()
+        user_password_entered = self.user_pass.get()
+
+        data = pd.read_csv("settings/users_list.csv")
+        database_user_pass = data.loc[data.name == f"{user_name_entered}", "password"]
+
+        if (f"{user_name_entered}" in data["name"].values) and (str(*database_user_pass) == user_password_entered):
+            self.security_passed = True
+            self.master.destroy()
+            print("It's SUCCESSES")
+            return True
+
+        elif f"{user_name_entered}" not in data["name"].values or str(*database_user_pass) != user_password_entered:
+            tkinter.messagebox.showinfo(
+                title="Login error",
+                message="User does not exist or password for current user is incorrect.\n"
+                        "Please check a spelling or create a new user"
             )
 
-
-
-
-
-
-    def users_list(self):
-        pass
+        else:
+            print("Something went wrong with Security Check")
