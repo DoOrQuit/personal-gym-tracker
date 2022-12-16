@@ -8,8 +8,10 @@ class MainInterface:
         self.current_user = current_user
         # -------- Window arrangement ---------- #
         self.root = Tk()
+        self.root.focus_force()
         self.root.title("Gym Activity Tracker")
         self.root.minsize(900, 520)
+        self.root.iconbitmap("images/main_ui_ico.ico")
         self.root.config(padx=15, pady=15)
         # ----------------------- Labels ------------------ #
         self.profile_photo = Label(text="PHOTO HERE").grid(row=1, column=0, columnspan=2, pady=(20,40))
@@ -20,7 +22,7 @@ class MainInterface:
         self.biceps_dia = Label(text="Biceps (DIA, cm) :").grid(column=0, row=6, pady=15)
         self.stomack_dia = Label(text="Stomack (DIA, cm) :").grid(column=0, row=7, pady=15)
         self.ass_dia = Label(text="Ass (DIA, cm) :").grid(column=0, row=8, pady=15)
-        self.date = Label(text=f"Date : {date.today()}").grid(column=4, row=0, pady=15)
+        self.date = Label(text=f"Date : {date.today().strftime('%d/%m/%Y')}").grid(column=4, row=0, pady=15)
         # ----------------------- Entries ------------------ #
         self.weight_entry = Entry(width=8).grid(column=1, row=4, pady=15)
         self.shoulders_entry = Entry(width=8).grid(column=1, row=5, pady=15)
@@ -49,7 +51,7 @@ class MainInterface:
 
     def settings(self):
         # ----------------------- Window Parameters ------------------ #
-        settings_window = Tk()
+        settings_window = Toplevel()
         settings_window.title("Settings")
         settings_window.minsize(500, 300)
         # ------------------------ Settings' Tabs --------------------- #
@@ -74,7 +76,7 @@ class MainInterface:
 
         # ------------------------ Global Settings' Dropdown Menus --------------------- #
         current_language_set = StringVar(global_settings_tab)
-        current_language_set.set("english")
+        current_language_set.set("English")
         settings_language_options = OptionMenu(global_settings_tab, current_language_set, "english", "українська")
         settings_language_options.grid(column=1, row=0)
 
