@@ -4,19 +4,21 @@ from tkinter.messagebox import showerror
 import pandas as pd
 import os
 
-# Fetching the users list for displaying in OptionMenu
-users_df = pd.read_csv("settings/users_list.csv")
-USERS_LIST = [user for user in users_df.name]
-
 
 class Security:
     def __init__(self):
+        self.users_df = pd.read_csv("settings/users_list.csv")
+        self.users_list = [user for user in self.users_df.name] # Fetching the users list for displaying in OptionMenu
         # -------- Window arrangement ------------------- #
         self.master = Tk()
         self.master.title("Gym Activity Tracker")
         self.master.geometry("600x300")
+        self.master.iconbitmap("images/security_ui_ico.ico")
         self.security_passed = False
-        self.user_name = StringVar(self.master, "User Name")
+        try:
+            self.user_name = StringVar(self.master, self.users_list[0])
+        except IndexError:
+            self.user_name = StringVar(self.master, "Choose an user")
         self.user_pass = StringVar(self.master)
         # -------- IMG/(Banner) placing ----------------- #
         self.canvas = Canvas(self.master, width=600, height=156)
@@ -37,9 +39,14 @@ class Security:
         self.login_button = Button(self.master, text="Login", width=25, command=self.security_check)
         self.login_button.grid(column=1, row=3)
         # --------- Login Entries ----------------------- #
-        self.user_drop_list = OptionMenu(self.master, self.user_name, *USERS_LIST)
-        self.user_drop_list.config(width=24)
-        self.user_drop_list.grid(column=1, row=1, pady=(20, 5))
+        try:
+            self.user_drop_list = OptionMenu(self.master, self.user_name, *self.users_list)
+            self.user_drop_list.config(width=24)
+            self.user_drop_list.grid(column=1, row=1, pady=(20, 5))
+        except TypeError:
+            self.user_drop_list = Label(self.master, text='No users available yet')
+            self.user_drop_list.grid(column=1, row=1, pady=(20, 5))
+
         self.password_entry = Entry(self.master, width=30, textvariable=self.user_pass)
         self.password_entry.grid(column=1, row=2, pady=(0, 10))
 
@@ -105,20 +112,19 @@ class Security:
         new_user_button.grid(column=1, row=3, pady=(20, 20))
 
 
-    def security_check(self):
+    def security_check(self)->bool|None:
         """Method validates the user's name and password (if applied) entered
         and returns True if security check has been passed"""
 
         user_name_entered = self.user_name.get()
         user_password_entered = self.user_pass.get()
 
-        data = pd.read_csv("settings/users_list.csv")
+        data = pd.read_csv("settings/users_list.csv", keep_default_na=False)
         database_user_pass = data.loc[data.name == f"{user_name_entered}", "password"]
 
         if (f"{user_name_entered}" in data["name"].values) and (str(*database_user_pass) == user_password_entered):
             self.security_passed = True
             self.master.destroy()
-            print("It's SUCCESSES")
             return True
 
         elif f"{user_name_entered}" not in data["name"].values or str(*database_user_pass) != user_password_entered:
